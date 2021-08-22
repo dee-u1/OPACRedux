@@ -6,6 +6,17 @@ export const fetchStudents = createAsyncThunk('students/fetchStudents', async ()
   return response.data;
 });
 
+export const checkStudentAccount = createAsyncThunk('students/checkStudentAccount', async (user) => {
+  
+  const params = {
+    username: user.username,
+    password : user.password
+  };
+
+  const response = await axios.get('/checkstudentaccount',{ params } );
+  return response.data;
+});
+
 export const addStudent = createAsyncThunk('students/addStudent', async (student) => {
   const newStudent = {
         IDNum: student.IDNum,
@@ -22,12 +33,24 @@ export const addStudent = createAsyncThunk('students/addStudent', async (student
 export const studentSlice = createSlice({
   name: 'students',
   initialState: {
-    students: []
+    students: [],
+    IDNum: '',
+    firstName: '',
+    lastName: ''
   },
   reducers: {
-    // fetchBooks: (state, action) => {
-    //   state.books = action.payload;
-    // }
+    setStudentData: (state, action) => {
+      //console.log(action.payload);
+      //alert(action.payload.IDNum);
+      state.IDNum = action.payload.IDNum;
+      state.firstName = action.payload.firstName;
+      state.lastName = action.payload.lastName;
+    },
+    logOutStudent: (state) => {
+      state.IDNum = '';
+      state.firstName = '';
+      state.lastName = '';
+    }
   },
   extraReducers: {
     [fetchStudents.pending]: (state, action) => {
@@ -39,7 +62,16 @@ export const studentSlice = createSlice({
     [fetchStudents.error]: (state, action) => {
       alert("Failed to get Students");
     },
+    [checkStudentAccount.fulfilled]: (state, action) => {
+      state.IDNum = action.payload.IDNum;
+      state.firstName = action.payload.firstName;
+      state.lastName = action.payload.lastName;
+    },
+    [checkStudentAccount.error]: (state, action) => {
+      alert("Failed to verify student account");
+    },
   }
 });
 
+export const { setStudentData, logOutStudent } = studentSlice.actions;
 export default studentSlice.reducer;

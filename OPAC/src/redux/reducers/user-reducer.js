@@ -16,19 +16,22 @@ export const checkUser = createAsyncThunk('user/checkUser', async (user) => {
 export const userSlice = createSlice({
   name: 'user',
   initialState: {
-    user: '',
-    isAdmin: false,
+    user: {
+      username: '',
+      isAdmin: false
+    },
     loading: 'idle',
     currentRequestId: undefined,
     error: null
   },
   reducers: {
     setUser: (state, action) => {
-      state.user  = action.payload;
+      state.user.username  = action.payload.username;
+      state.user.isAdmin = action.payload.isAdmin;
     },
     logoutUser: (state) => {
-      state.user = '';
-      state.isAdmin = false;
+      state.user.username = '';
+      state.user.isAdmin = false;
     }
   },
   extraReducers: {

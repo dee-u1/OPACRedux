@@ -28,8 +28,6 @@ let books = [
   {"ISBN" : "013", "title": "Lord of the Rings", "author": "Tolkien, J.R.", "edition": 1937, "publication": "Penguin"},
 ];
 
-let reservedBooks = [];
-
 let users = [
   {username: "test", password: "test", name: "Rodelio"},
   {username: "test2", password: "test2", name: "Rodelio2"},
@@ -42,18 +40,26 @@ let students = [
     firstName: 'Rodelio',
     lastName: 'Rodriguez',
     userName: 'dee-u',
-    password: 'mahaba',
-    confirmpassword: ''
+    password: 'mahaba'
   },
   {
     IDNum: '0002',
     firstName: 'Bill',
     lastName: 'Gates',
     userName: 'bill',
-    password: 'mahaba',
-    confirmpassword: ''
+    password: 'mahaba'
   }
 ];
+
+let reservations = [
+  {
+    IDNum: '0001',
+    firstName: 'Rodelio',
+    lastName: 'Rodriguez',
+    ISBN : "001", 
+    title: "React"
+  }
+]
 
 app.use(cors());
 app.use(urlencoded({ extended: false }));
@@ -62,6 +68,17 @@ app.use(json());
 //retrieve
 app.get("/books", (req, res) =>{
   res.json({ data: books });
+});
+
+const filterObjectArray = (arr, filterArr) => (
+  arr.filter( el =>
+      filterArr.every( f => f.ISBN !== el.ISBN )
+  )
+);
+
+app.get("/availablebooks", (req, res) =>{
+  let available = filterObjectArray(books, reservations);
+  res.json({ data: available });
 });
 
 //add
@@ -114,36 +131,72 @@ app.post("/students", (req, res) => {
   res.json({ data: students })
 });
 
-app.get("/books/reservations", (req, res) => {
-  res.json(selectedFoods);
-});
-
 app.get("/checkuser", (req, res) => {
   const username = req.query.username;
   const password = req.query.password;
 
   let nameOfUser = '';
 
-  console.log("query", req.query);
-  console.log("body" ,req.body);
-  console.log("params", req.params);
-  //console.log("req", req);
-  //console.log("res", res);
-
-  for(i=0; i < users.length; i++){
-    if (users[i].username === username && users[i].password === password){
-      nameOfUser=users[i].name;
-      break;
-    }
+  let result = users.filter(item => item.username === username && item.password === password);
+  if (result.length > 0) {
+    nameOfUser=result[0].name;
   }
-  
+
   res.json(nameOfUser);
 });
 
-app.post('/clear/selection', (req, res) => {
-    reservedFoods = [...[]];
-    res.json(reservedFoods);
-})
+app.get("/checkstudentaccount", (req, res) => {
+  const username = req.query.username;
+  const password = req.query.password;
+
+  let user = {
+    IDNum: '',
+    firstName: '',
+    lastName: ''
+  }
+
+  let result = students.filter(item => item.userName === username && item.password === password);
+  
+  if (result.length > 0) {
+    //nameOfUser=result[0].name;
+    user = {
+      IDNum: result[0].IDNum,
+      firstName: result[0].firstName,
+      lastName: result[0].lastName
+    }
+  }
+
+  res.json(user);
+});
+
+app.get("/books/studentreservations", (req, res) =>{
+  res.json({ data: reservations });
+});
+
+app.get("/books/reservations/:IDNum", (req, res) =>{
+  const IDNum = req.params.IDNum;
+  let result = reservations.filter(item => item.IDNum === IDNum);
+  //console.log("Result", result);
+  res.json({ data: result });
+});
+
+//add reservation
+app.post("/books/reservations", (req, res) => {
+  reservations = [ ...reservations, ...req.body ];
+  let result = reservations.filter(item => item.IDNum === req.body[0].IDNum);
+  res.json({ data: result })
+});
+
+app.delete('/books/cancelreservations/:ISBN&:IDNum', async (req, res) => {
+  const ISBN = req.params.ISBN;
+  const IDNum = req.params.IDNum;
+
+  const index = reservations.findIndex((book) => book.ISBN === ISBN && book.IDNum === IDNum);
+  reservations.splice(index, 1);
+  let result = reservations.filter(item => item.IDNum === IDNum);
+  console.log("result", result);
+  res.json({ data: result })
+});
 
 app.listen(8000, () => {
   console.log("Server is running and listening to port 8000");

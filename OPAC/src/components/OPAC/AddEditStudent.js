@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import Button from "react-bootstrap/Button"
+import Form from "react-bootstrap/Form"
 import Modal from 'react-bootstrap/Modal'
 import { useHistory } from "react-router-dom";
 
@@ -100,7 +101,7 @@ const AddEditStudent = (props) => {
                     <Modal.Title>{isInEdit ? 'Update Student Data' : 'Add New Student'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                <div className="form-group">
+                <Form.Group className="mb-3">      
                     <label htmlFor="IDNum">ID No.:</label>
                     {   isInEdit  ?
                         <input 
@@ -119,8 +120,8 @@ const AddEditStudent = (props) => {
                             className="form-control"
                         />
                     }
-                </div>
-                <div className="form-group">       
+                </Form.Group> 
+                <Form.Group className="mb-3">       
                     <label htmlFor="firstName">First Name:</label>
                     <input 
                         type="text"
@@ -129,8 +130,8 @@ const AddEditStudent = (props) => {
                         onChange={inputChangeHandler} 
                         className="form-control"
                     />
-                </div>
-                <div className="form-group">       
+                </Form.Group>
+                <Form.Group className="mb-3">       
                     <label htmlFor="lastName">Last Name:</label>
                     <input 
                         type="text"
@@ -139,8 +140,8 @@ const AddEditStudent = (props) => {
                         onChange={inputChangeHandler} 
                         className="form-control"
                     />
-                </div>
-                <div className="form-group">       
+                </Form.Group>
+                <Form.Group className="mb-3">        
                     <label htmlFor="userName">Username:</label>
                     <input 
                         type="text"
@@ -149,8 +150,8 @@ const AddEditStudent = (props) => {
                         onChange={inputChangeHandler} 
                         className="form-control"
                     />
-                </div>
-                <div className="form-group">       
+                </Form.Group>
+                <Form.Group className="mb-3">       
                     <label htmlFor="password">Password:</label>
                     <input 
                         type="password"
@@ -159,8 +160,8 @@ const AddEditStudent = (props) => {
                         onChange={inputChangeHandler} 
                         className="form-control"
                     />
-                </div>
-                <div className="form-group">       
+                </Form.Group>
+                <Form.Group className="mb-3">    
                     <label htmlFor="confirmpassword">Confirm Password:</label>
                     <input 
                         type="password"
@@ -169,7 +170,7 @@ const AddEditStudent = (props) => {
                         onChange={inputChangeHandler} 
                         className="form-control"
                     />
-                </div>             
+                </Form.Group>            
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose} >Close</Button>

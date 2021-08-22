@@ -18,8 +18,9 @@ import './opac.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { logoutUser, setUser } from '../../redux/reducers/user-reducer';
 import { useHistory } from "react-router-dom";
-import { addStudent } from '../../redux/reducers/student-reducer';
-
+import { addStudent, logOutStudent } from '../../redux/reducers/student-reducer';
+import ReservedBooks from './ReservedBooks';
+import StudentReservedBooks from './StudentReservedBooks';
 //by Rodelio M. Rodriguez
 
 const OPAC = (props) => {
@@ -29,6 +30,8 @@ const OPAC = (props) => {
     
     const history = useHistory();
     let currentUser = useSelector(state => state.user.user);
+    let currentStudent = useSelector(state => state.students.IDNum);
+
     const dispatch = useDispatch();
     
     const setBookSearchResult = (data) => {
@@ -44,6 +47,8 @@ const OPAC = (props) => {
     }
 
     const logoutHandler = () => {
+        if (currentUser.isAdmin === false)
+            dispatch(logOutStudent());
         dispatch(logoutUser());
     }
 
@@ -55,17 +60,24 @@ const OPAC = (props) => {
                 <Navbar.Toggle aria-controls="responsive-navbar-nav" />
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">                       
-                        {currentUser.length > 0 ?
+                        {currentUser.username.length > 0 && currentUser.isAdmin === true ?
                             <Nav>
                             <Nav.Link as={Link} to='/books'>Books</Nav.Link> 
                             <Nav.Link as={Link} to='/students'>Students</Nav.Link> 
+                            <Nav.Link as={Link} to='/reservedBooks'>Reserved Books</Nav.Link> 
+                            </Nav>
+                            : ''
+                        }
+                        {currentUser.username.length > 0 && currentUser.isAdmin === false ?
+                            <Nav>
+                            <Nav.Link as={Link} to='/reservations'>Reserved Books</Nav.Link> 
                             </Nav>
                             : ''
                         }
                     </Nav>
-                    {currentUser.length > 0 ?
+                    {currentUser.username.length > 0  ?
                         <Nav>
-                            <Nav.Link as={Link} to="/" onClick={logoutHandler}>Log-out</Nav.Link>
+                            <Nav.Link as={Link} to="/" onClick={logoutHandler}>Log-out {currentUser.username} </Nav.Link>
                         </Nav> :
                         <Nav>
                             <Nav.Link as={Link} to="/register">Register</Nav.Link>
@@ -90,6 +102,12 @@ const OPAC = (props) => {
             </Route>
             <Route path="/register">
                 <AddEditStudent show={true} handleClose={handleClose} addStudent={addNewStudent} />
+            </Route>
+            <Route path="/reservedBooks">
+                <ReservedBooks />
+            </Route>
+            <Route path="/reservations">
+                <StudentReservedBooks />
             </Route>
             <Route path="/">
                 <SearchBook BookSearchResult={setBookSearchResult} />

@@ -1,5 +1,4 @@
-# food-searcher
-
+# OPAC Server
 
 
 ## Getting started

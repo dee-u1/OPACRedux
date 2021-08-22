@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import Button from "react-bootstrap/Button"
+import Form from "react-bootstrap/Form"
 import Modal from 'react-bootstrap/Modal'
 import { useDispatch } from 'react-redux';
 import { useState } from 'react';
@@ -94,7 +95,7 @@ const AddEditBook = (props) => {
                     <Modal.Title>{isInEdit ? 'Update Book' : 'Add New Book'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                <div className="form-group">
+                <Form.Group className="mb-3">  
                     <label htmlFor="ISBN">ISBN:</label>
                     {   isInEdit  ?
                         <input 
@@ -113,8 +114,8 @@ const AddEditBook = (props) => {
                             className="form-control"
                         />
                     }
-                </div>
-                <div className="form-group">       
+                </Form.Group>           
+                <Form.Group className="mb-3">      
                     <label htmlFor="title">Title:</label>
                     <input 
                         type="text"
@@ -123,8 +124,8 @@ const AddEditBook = (props) => {
                         onChange={inputChangeHandler} 
                         className="form-control"
                     />
-                </div>
-                <div className="form-group">       
+                </Form.Group>  
+                <Form.Group className="mb-3">      
                     <label htmlFor="author">Author:</label>
                     <input 
                         type="text"
@@ -133,8 +134,8 @@ const AddEditBook = (props) => {
                         onChange={inputChangeHandler} 
                         className="form-control"
                     />
-                </div>
-                <div className="form-group">       
+                </Form.Group>  
+                <Form.Group className="mb-3">      
                     <label htmlFor="edition">Edition:</label>
                     <input 
                         type="text"
@@ -143,8 +144,8 @@ const AddEditBook = (props) => {
                         onChange={inputChangeHandler} 
                         className="form-control"
                     />
-                </div>
-                <div className="form-group">       
+                </Form.Group>  
+                <Form.Group className="mb-3">   
                     <label htmlFor="publication">Publication:</label>
                     <input 
                         type="text"
@@ -153,7 +154,7 @@ const AddEditBook = (props) => {
                         onChange={inputChangeHandler} 
                         className="form-control"
                     />
-                </div>             
+                </Form.Group>             
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose} >Close</Button>

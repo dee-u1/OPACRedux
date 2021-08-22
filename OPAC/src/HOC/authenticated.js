@@ -8,17 +8,22 @@ const authenticated = WrappedComponent => props => {
     const history = useHistory();
 
     useEffect(() => {
-        if (currentUser.length < 1)
-        {
+        if (currentUser.username.length < 1){
             alert("You are not allowed here!");
             history.push("/")
+        }
+        else{
+            if (currentUser.isAdmin === false){
+                alert("You are not allowed here!");
+                history.push("/")
+            }
         }
             
       });
 
     return (
         <div>
-            {currentUser.length > 0 ? <WrappedComponent {...props}/> : null } 
+            {currentUser.username.length > 0  && currentUser.isAdmin === true ? <WrappedComponent {...props}/> : null } 
         </div>
     );
   }

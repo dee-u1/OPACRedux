@@ -1,8 +1,10 @@
-import React, { useEffect} from 'react';
+import React, { useEffect, useState } from 'react';
 import Table from 'react-bootstrap/Table';
+import Button from 'react-bootstrap/esm/Button';
 import { useSelector, useDispatch } from 'react-redux';
 import Book from './Book';
-import { fetchBooks } from '../../redux/reducers/book-reducer';
+import { addNewReservations, fetchBooks, fetchAvailableBooks } from '../../redux/reducers/book-reducer';
+import { useHistory } from "react-router-dom";
 import './opac.css';
 
 const SearchResult = (props) => {
@@ -10,13 +12,61 @@ const SearchResult = (props) => {
     const currentUser = useSelector(state => state.user.user)
     const searchWord = useSelector(state => state.search.word)
     const searchOption = useSelector(state => state.search.option)
+    const [selection, setSelection] = useState([]);
 
     const books = useSelector(state => state.libro.books);
     const dispatch = useDispatch();
+    const history = useHistory();
 
     useEffect(()=> {
-        dispatch(fetchBooks());
+        dispatch(fetchAvailableBooks());
     },[]);
+
+    const itemChecked = (book) => {        
+        let selectionCopy = [...selection];                
+        selectionCopy.push(book);    
+        setSelection(selectionCopy);
+    }
+
+    const itemUnchecked = (book) =>{
+        let selectionCopy = [...selection];
+        let index = selectionCopy.findIndex(item => item === book);
+        selectionCopy.splice(index,1);
+        setSelection(selectionCopy);
+    }
+
+    let newSelections = [];
+    let currentIDNum = useSelector(state => state.students.IDNum);
+    let currentFirstName = useSelector(state => state.students.firstName);
+    let currentLastName = useSelector(state => state.students.lastName);
+    
+    const myFunction=(item, index) => {
+        const book = {
+            IDNum: currentIDNum,
+            firstName: currentFirstName,
+            lastName: currentLastName,
+            ISBN : item.ISBN, 
+            title: item.title
+        }
+        newSelections.push(book);
+    }
+
+    const btnSubmitClickHandler = () => {
+
+        if (selection.length < 1){
+            alert("Please make a selection first.");
+            return;
+        }
+
+        const params = {
+            books: selection
+        };
+
+        selection.forEach(myFunction);
+        
+        dispatch(addNewReservations(newSelections));
+        history.push("/reservations");
+    }
 
     let booksDisplay = [];
     if (Array.isArray(books.data)) {
@@ -25,7 +75,10 @@ const SearchResult = (props) => {
         booksDisplay = searchResult.map(book => 
         <Book 
             key={book.ISBN} 
-            book={book} 
+            book={book}
+            itemChecked={itemChecked}
+            itemUnchecked={itemUnchecked}
+            isSearchResult={true}
         />)
     }
     
@@ -50,6 +103,9 @@ const SearchResult = (props) => {
                 {booksDisplay}
                 </tbody>
             </Table>
+            { currentUser.isAdmin===false && currentUser.username.length > 0 ?
+            <Button variant="primary" onClick={btnSubmitClickHandler}>Submit selection</Button>
+            : null }
         </>      
     );
 }

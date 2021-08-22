@@ -1,5 +1,6 @@
 import React, { useEffect, useState }   from 'react';
 import Button from "react-bootstrap/Button"
+import Form from  "react-bootstrap/Form";
 import { AiFillDelete, AiFillEdit } from "react-icons/ai";
 import { useDispatch, useSelector } from 'react-redux';
 import { removeBook } from '../../redux/reducers/book-reducer';
@@ -13,6 +14,7 @@ const Book = (props) => {
             publication: props.book.publication
         }
     );
+    const [isSearchResult, setIsSearchResult]=useState(props.isSearchResult);
 
     const currentUser = useSelector(state => state.user.user)
     const dispatch = useDispatch();
@@ -37,10 +39,23 @@ const Book = (props) => {
         dispatch(removeBook(book.ISBN));
     }
 
+    const cancelBtnClickHandler = () => {
+        dispatch(removeBook(book.ISBN));
+    }
+
+    const checkedHandler = (e) => {
+        if (e.target.checked === true){
+            props.itemChecked(book)
+        }
+        else{
+            props.itemUnchecked(book)
+        }
+    }   
+
     return(            
         <tr>
             <td>
-                {book.ISBN} 
+                { currentUser.isAdmin===false && currentUser.username.length > 0 ? <Form.Check type="checkbox" onChange={checkedHandler} label={book.ISBN} /> : book.ISBN }
             </td>
             <td>
                 {book.title} 
@@ -54,12 +69,17 @@ const Book = (props) => {
             <td className="d-none d-lg-block">
                 {book.publication} 
             </td>
-            {currentUser.length > 0 ?
+            {currentUser.username.length > 0 && currentUser.isAdmin === true  && isSearchResult===false ?
                 <td>
                     <Button variant="success" onClick={editBtnClickHandler}><AiFillEdit /></Button>{' '}
                     <Button variant="danger" onClick={deleteBtnClickHandler}><AiFillDelete /></Button>
                 </td> : null
             }
+            {/* {currentUser.username.length > 0 && currentUser.isAdmin === false ?
+                <td>
+                    <Button variant="danger" onClick={cancelBtnClickHandler}><AiFillDelete /></Button>
+                </td> : null
+            } */}
         </tr>
     );
 }

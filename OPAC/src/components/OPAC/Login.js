@@ -2,8 +2,11 @@ import React, {useState} from "react";
 import { createSlice, createAsyncThunk  } from '@reduxjs/toolkit';
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/esm/Button';
+import Form from 'react-bootstrap/esm/Form';
+
 import { useHistory } from "react-router-dom";
 import { setUser, checkUser } from '../../redux/reducers/user-reducer';
+import { checkStudentAccount, setStudentData } from "../../redux/reducers/student-reducer";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
 
@@ -14,9 +17,7 @@ const Login = (props) => {
             password: ''
         }
     )
-
-    //const { user, loading, error } = useSelector(state => state.user)
-
+    const [optionSelected, setOptionSelected]=useState('admin');
     const history = useHistory();
     const dispatch = useDispatch();
 
@@ -30,11 +31,40 @@ const Login = (props) => {
     const fetchOneUser = async params => {
         try {
             const resultAction = await dispatch(checkUser(params));
-            const user = resultAction.payload;
-            dispatch(setUser(user));
-            history.push("/");
-            //setShow(false);
-            //alert(`Fetched ${user}`);
+            //const user = resultAction.payload;
+            const user = {
+                username: resultAction.payload,
+                isAdmin: true
+            };
+            if (user.username.trim().length < 1)
+                alert("Invalid username or password");
+            else{
+                dispatch(setUser(user));
+                history.push("/");
+            }
+        } catch (err) {
+          alert(`Fetch failed: ${err.message}`);
+        }
+      }
+
+
+      const fetchStudentAccount = async params => {
+        try {
+            const resultAction = await dispatch(checkStudentAccount(params));
+            const response = resultAction.payload;
+            const user = {
+                username: response.firstName + ' ' + response.lastName,
+                isAdmin: false
+            };
+
+            if (user.username.trim().length < 1)
+                alert("Invalid username or password");
+            else{
+                dispatch(setUser(user));
+                dispatch(setStudentData(response));
+                history.push("/");
+            }
+            
         } catch (err) {
           alert(`Fetch failed: ${err.message}`);
         }
@@ -45,50 +75,12 @@ const Login = (props) => {
             username: loginData.username,
             password: loginData.password
             };
-        
-        // axios.get('/checkuser', { params } )
-        // .then(function(response) {              
-        //     if (response.data.length > 0){
-        //         alert("Credentials found");
-        //         dispatch(setUser(response.data));            
-        //         history.push("/");
-        //     }
-        //     else{
-        //         alert("Wrong username or password");
-        //     }
-        // }).catch(function(error) {
-        //     console.log('Error on Authentication');
-        //     alert("error");
-        // });
 
-        dispatch(checkUser(params));
-        fetchOneUser(params);
-
-        // dispatch(checkUser(params)).then(() => {
-        //     // do additional work
-        //     alert('here!');
-        //   })
-
-        // try {
-        // const resultAction = await dispatch(checkUser(params));
-        // const user = unwrapResult(resultAction)
-        // showToast('success', `Fetched ${user.name}`)
-        // } catch (err) {
-        // showToast('error', `Fetch failed: ${err.message}`)
-        // }
-
-
-
-        // if (loginData.username==="test" && loginData.password==="test"){
-        //     dispatch(setUser('rodelio'));
-        //     props.adminLogin(true);
-        //     alert("Credentials found");
-        //     history.push("/");
-        //     setShow(false);
-        // }
-        // else{
-        //     alert("Wrong username or password");
-        // }
+        //dispatch(checkUser(params));
+        if (optionSelected === "admin")
+            fetchOneUser(params);
+        else
+            fetchStudentAccount(params);
     }
 
     const handleClose = () => {
@@ -97,6 +89,10 @@ const Login = (props) => {
         history.push("/");
     };
 
+    const onChangeValue = (event) => {
+        setOptionSelected(event.target.value);
+    }
+
     return (
         <>
         <Modal show={show} onHide={handleClose}>
@@ -104,8 +100,25 @@ const Login = (props) => {
                     <Modal.Title>Log-in</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                
-                <div className="form-group">       
+
+                <Form.Group className="mb-3" onChange={onChangeValue}>
+                    <input
+                        id="admin"
+                        value="admin"
+                        name="option"
+                        type="radio"    
+                        defaultChecked
+                    />
+                    &nbsp; Admin&nbsp; &nbsp; 
+                    <input
+                        id="student"
+                        value="student"
+                        name="option"
+                        type="radio"
+                    />
+                    &nbsp; Student
+                </Form.Group>
+                <Form.Group className="mb-3"> 
                     <label htmlFor="username">Username:</label>
                     <input 
                         name="username"
@@ -115,8 +128,8 @@ const Login = (props) => {
                         value={loginData.username}
                         onChange={inputChangeHandler} 
                     />
-                </div>
-                <div className="form-group">       
+                </Form.Group>
+                <Form.Group className="mb-3">  
                     <label htmlFor="author">Password:</label>
                     <input 
                         name="password"
@@ -126,7 +139,7 @@ const Login = (props) => {
                         value={loginData.password}
                         onChange={inputChangeHandler} 
                     />
-                </div>                         
+                 </Form.Group>                
                 </Modal.Body>
                 <Modal.Footer>
                     <Button variant="secondary" onClick={handleClose} >Close</Button>

@@ -6,6 +6,26 @@ export const fetchBooks = createAsyncThunk('books/fetchBooks', async () => {
   return response.data;
 });
 
+export const fetchAvailableBooks = createAsyncThunk('books/fetchAvailableBooks', async () => {
+  const response = await axios.get('/availablebooks');
+  return response.data;
+});
+
+export const fetchStudentReservations = createAsyncThunk('books/fetchStudentReservations', async () => {
+  const response = await axios.get('/books/studentreservations');
+  return response.data;
+});
+
+export const fetchStudentReservationsInvididual = createAsyncThunk('books/fetchStudentReservationsInvididual', async (IDNum) => {
+  const response = await axios.get(`/books/reservations/${IDNum}`, IDNum);
+  return response.data;
+});
+
+export const addNewReservations = createAsyncThunk('books/addNewReservations', async (books) => {
+  const response = await axios.post('/books/reservations', books);
+  return response.data;
+});
+
 export const addBook = createAsyncThunk('books/addBook', async (book) => {
   const newBook = {
       ISBN: book.ISBN,
@@ -16,6 +36,12 @@ export const addBook = createAsyncThunk('books/addBook', async (book) => {
   };
   const response = await axios.post('/books', newBook);
     return response.data;
+});
+
+export const cancelReservedBook = createAsyncThunk('books/cancelReservedBook', async (book) => {
+  //cannot pass an object in DELETE
+  const response = await axios.delete(`/books/cancelreservations/${book.ISBN}&${book.IDNum}` );
+  return response.data;
 });
 
 export const removeBook = createAsyncThunk('books/remove', async (ISBN) => {
@@ -31,7 +57,8 @@ export const updateBook = createAsyncThunk('book/updateBook', async (book) => {
 export const bookSlice = createSlice({
   name: 'libro',
   initialState: {
-    books: []
+    books: [],
+    allReservedBooks: []
   },
   reducers: {
     // fetchBooks: (state, action) => {
@@ -47,6 +74,12 @@ export const bookSlice = createSlice({
     },
     [fetchBooks.error]: (state, action) => {
       alert("Failed to get Books");
+    },
+    [fetchStudentReservations.fulfilled]: (state, action) => {
+      state.allReservedBooks = action.payload;
+    },
+    [fetchStudentReservations.error]: (state, action) => {
+      alert("Failed to get All Reserved Books");
     },
     [addBook.fulfilled]: (state, action) => {
       state.books = action.payload;
@@ -66,7 +99,31 @@ export const bookSlice = createSlice({
     },
     [updateBook.rejected]: (state, action) => {
       alert("Error updating book");
-    }
+    },
+    [fetchStudentReservationsInvididual.fulfilled]: (state, action) => {
+      state.allReservedBooks = action.payload;
+    },
+    [fetchStudentReservationsInvididual.error]: (state, action) => {
+      alert("Failed to get All Reserved Books");
+    },
+    [addNewReservations.fulfilled]: (state, action) => {
+      state.allReservedBooks = action.payload;
+    },
+    [addNewReservations.error]: (state, action) => {
+      alert("Failed to save new reservations");
+    },
+    [cancelReservedBook.fulfilled]: (state, action) => {
+      state.allReservedBooks = action.payload;
+    },
+    [cancelReservedBook.error]: (state, action) => {
+      alert("Failed to cancel book reservation");
+    },
+    [fetchAvailableBooks.fulfilled]: (state, action) => {
+      state.books = action.payload;
+    },
+    [fetchAvailableBooks.error]: (state, action) => {
+      alert("Failed to get available Books");
+    },
   }
 });
 

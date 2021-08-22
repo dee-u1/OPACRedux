@@ -41,6 +41,7 @@ const Books = (props) => {
                 key={book.ISBN} 
                 book={book} 
                 editBook={editBook}
+                isSearchResult={false}
             />)
     }
     
@@ -52,7 +53,7 @@ const Books = (props) => {
             <div className="row">
                 <div className="col-md-9"><h1 className="page-header">Books</h1></div>
                 <div className="col-md-3"><h1 className="page-header">
-                    {currentUser.length > 0  ? 
+                    {currentUser.username.length > 0 && currentUser.isAdmin === true  ? 
                     <button type="button" onClick={displayDataEntry} className="btn btn-success" >Add New Entry</button> : null }                    
                     </h1></div>
             </div>
@@ -64,7 +65,7 @@ const Books = (props) => {
                         <th>Author</th>
                         <th>Edition</th>
                         <th className="d-none d-lg-block">Publication</th>
-                        {currentUser.length > 0 ? <th>Action</th> : null }
+                        {currentUser.username.length > 0 && currentUser.isAdmin === true ? <th>Action</th> : null }
                     </tr>
                 </thead>
                 <tbody>
